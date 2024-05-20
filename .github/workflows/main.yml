@@ -1,4 +1,4 @@
-name: AML Mod Compiler
+name: AML Mod Compiler And Release
 
 on:
   push:
@@ -43,3 +43,26 @@ jobs:
       with:
         name: compiled-mod.zip
         path: ./libs
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          tag_name: ${{ github.run_number }}${{ github.workflow_sha }}
+          release_name: ${{ github.workflow_sha }}
+
+
+        
+    - name: release assets
+      id: upload-to-assets
+      uses: actions/upload-release-asset@v1
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./libs/armeabi-v7a/libWideRender.so
+          asset_name: libWideRender.so
+          asset_content_type: application/octet-stream
+          
